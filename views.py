@@ -2,12 +2,23 @@ from templator import render
 
 
 def index(request):
-    context = [{'title': 'Dark'}]
+    context = {
+        'title': 'Dark',
+        'name_templates': {'index': '/', 'contact': '/contacts/'},
+    }
     return '200 OK', [render('templates/index.html', context=context)]
 
 
 def contacts(request):
-    context = [{'title': 'Dark'}]
+    if request['POST_DATA']:
+        print(request['POST_DATA'])
+    if request['GET_DATA']:
+        print(request['GET_DATA'])
+    context = {
+        'title': 'Dark',
+        'name_templates': {'index': '/', 'contact': '/contacts/'},
+
+    }
     return '200 OK', [render('templates/contact.html', context=context)]
 
 
