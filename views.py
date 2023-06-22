@@ -3,10 +3,10 @@ from templator import render
 
 def index(request):
     context = {
-        'title': 'Dark',
+        'title': 'Index',
         'name_templates': {'index': '/', 'contact': '/contacts/'},
     }
-    return '200 OK', [render('templates/index.html', context=context)]
+    return '200 OK', [render('index.html', context=context)]
 
 
 def contacts(request):
@@ -15,11 +15,11 @@ def contacts(request):
     if request['GET_DATA']:
         print(request['GET_DATA'])
     context = {
-        'title': 'Dark',
+        'title': 'Contact',
         'name_templates': {'index': '/', 'contact': '/contacts/'},
 
     }
-    return '200 OK', [render('templates/contact.html', context=context)]
+    return '200 OK', [render('contact.html', context=context)]
 
 
 def not_found(request):

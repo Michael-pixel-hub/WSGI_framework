@@ -1,7 +1,10 @@
 from jinja2 import Template
+from jinja2.environment import Environment
+from jinja2 import FileSystemLoader
 
 
 def render(template_name, **kwargs):
-    with open(template_name, 'r') as file:
-        ready_template = Template(file.read())
-    return ready_template.render(**kwargs).encode('utf-8')
+    env = Environment()
+    env.loader = FileSystemLoader('templates')
+    template = env.get_template(template_name)
+    return template.render(**kwargs).encode('utf-8')
