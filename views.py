@@ -1,10 +1,20 @@
 from templator import render
+from patterns.generating_patterns import Engine, Logger
+
+
+engine = Engine()
+logger = Logger('new')
 
 
 def index(request):
     context = {
         'title': 'Index',
-        'name_templates': {'index': '/', 'contact': '/contacts/'},
+        'name_templates': {
+            'index': '/',
+            'contact': '/contacts/',
+            'categories': '/categories/',
+            'create_categories': '/create_categories/'
+        },
     }
     return '200 OK', [render('index.html', context=context)]
 
@@ -16,10 +26,82 @@ def contacts(request):
         print(request['GET_DATA'])
     context = {
         'title': 'Contact',
-        'name_templates': {'index': '/', 'contact': '/contacts/'},
+        'name_templates': {
+            'index': '/',
+            'contact': '/contacts/',
+            'categories': '/categories/',
+            'create_categories': '/create_categories/'
+        },
 
     }
     return '200 OK', [render('contact.html', context=context)]
+
+
+def categories_view(request):
+    context = {
+        'title': 'Categories create',
+        'name_templates': {
+            'index': '/',
+            'contact': '/contacts/',
+            'categories': '/categories/',
+            'create_categories': '/create_categories/',
+            'courses': '/courses/'
+        },
+        'list_category': engine.categories
+    }
+    return '200 OK', [render('view_categories.html', context=context)]
+
+
+def categories_create(request):
+    context = {
+        'title': 'Categories create',
+        'name_templates': {
+            'index': '/',
+            'contact': '/contacts/',
+            'categories': '/categories/',
+            'create_categories': '/create_categories/'
+        },
+    }
+    if request['POST_DATA']:
+        name_cat = engine.create_category(request['POST_DATA']['name_category'])
+        engine.categories.append(name_cat)
+        context['list_category'] = engine.categories
+        logger.logger('Категория создана')
+        return '302 FOUND', [render('index.html', context=context)]
+    return '200 OK', [render('create_categories.html', context=context)]
+
+
+def courses_view(request):
+    context = {
+        'title': 'Courses',
+        'name_templates': {
+            'index': '/',
+            'contact': '/contacts/',
+            'categories': '/categories/',
+            'create_courses': '/create_course/'
+        },
+        'list_courses': engine.courses
+    }
+    return '200 OK', [render('view_courses.html', context=context)]
+
+
+def courses_create(request):
+    context = {
+        'title': 'Categories create',
+        'name_templates': {
+            'index': '/',
+            'contact': '/contacts/',
+            'categories': '/categories/',
+            'create_categories': '/create_categories/'
+        },
+    }
+    if request['POST_DATA']:
+        course = engine.create_course(request['POST_DATA']['type'], request['POST_DATA']['name_course'], request['POST_DATA']['name_category'])
+        engine.courses.append(course)
+        context['list_courses'] = engine.courses
+        logger.logger('Курс создан')
+        return '302 FOUND', [render('index.html', context=context)]
+    return '200 OK', [render('create_courses.html', context=context)]
 
 
 def not_found(request):
