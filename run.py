@@ -1,5 +1,5 @@
 from simple_wsgi import Application, data
-from urls import routes
+from views import routes
 from wsgiref.simple_server import make_server
 
 application = Application(routes, data)

@@ -1,11 +1,13 @@
 from templator import render
-from patterns.generating_patterns import Engine, Logger
+from patterns.generating_patterns import Engine, Logger, routes_decorator
 
 
 engine = Engine()
 logger = Logger('new')
+routes = {}
 
 
+@routes_decorator('/', routes)
 def index(request):
     context = {
         'title': 'Index',
@@ -19,6 +21,7 @@ def index(request):
     return '200 OK', [render('index.html', context=context)]
 
 
+@routes_decorator('/contacts/', routes)
 def contacts(request):
     if request['POST_DATA']:
         print(request['POST_DATA'])
@@ -37,6 +40,7 @@ def contacts(request):
     return '200 OK', [render('contact.html', context=context)]
 
 
+@routes_decorator('/categories/', routes)
 def categories_view(request):
     context = {
         'title': 'Categories create',
@@ -52,6 +56,7 @@ def categories_view(request):
     return '200 OK', [render('view_categories.html', context=context)]
 
 
+@routes_decorator('/create_categories/', routes)
 def categories_create(request):
     context = {
         'title': 'Categories create',
@@ -71,6 +76,7 @@ def categories_create(request):
     return '200 OK', [render('create_categories.html', context=context)]
 
 
+@routes_decorator('/courses/', routes)
 def courses_view(request):
     context = {
         'title': 'Courses',
@@ -85,6 +91,7 @@ def courses_view(request):
     return '200 OK', [render('view_courses.html', context=context)]
 
 
+@routes_decorator('/create_course/', routes)
 def courses_create(request):
     context = {
         'title': 'Categories create',

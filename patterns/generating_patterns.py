@@ -106,3 +106,13 @@ class Logger(metaclass=Singleton):
     @staticmethod
     def logger(text):
         print('log >> ', text)
+
+
+def routes_decorator(path, routes):
+    def decorator_(func):
+        def inner():
+            func()
+
+        routes[path] = func
+        return inner
+    return decorator_
