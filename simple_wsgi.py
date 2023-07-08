@@ -83,7 +83,7 @@ def deserialization_data(data_post: bytes) -> dict:
     """
     result = {}
     if data_post:
-        decode_data_post = data_post.decode()
+        decode_data_post = data_post.decode('utf-8')
         result = parse_data(decode_data_post)
     return result
 

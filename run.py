@@ -5,6 +5,6 @@ from wsgiref.simple_server import make_server
 application = Application(routes, data)
 
 if __name__ == '__main__':
-    server = make_server('localhost', 8000, application)
+    server = make_server('localhost', 8001, application)
     print('Запуск сервера на 8000 порту...')
     server.serve_forever()

@@ -22,7 +22,7 @@
         <p>List categories courses:</p>
         <ul>
             {% for i in context['list_category'] %}
-                <li><a href=" {{context['name_templates']['courses']}} ">{{ i.name }}</a></li>
+                <li><a id=" {{ i.name }} " href=" {{context['name_templates']['courses']}} " >{{ i.name }}</a></li>
             {% endfor %}
         </ul>
         <a href=" {{context['name_templates']['create_categories']}} ">Create category</a>
