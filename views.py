@@ -1,11 +1,15 @@
 from templator import render
-from patterns.generating_patterns import Engine, Logger, routes_decorator, EmailNotifier
+from patterns.generating_patterns import Engine, Logger, routes_decorator, EmailNotifier, UserFactory
+from patterns.architectural_system_patterns import UnitOfWork
+from patterns.generating_patterns import MapperRegistry
 
 
 engine = Engine()
 logger = Logger('new')
 routes = {}
 email_observer = EmailNotifier()
+UnitOfWork.new_current()
+UnitOfWork.get_current().set_mapper_registry(MapperRegistry)
 
 
 @routes_decorator('/', routes)
@@ -144,6 +148,7 @@ def courses_update(request):
 
 @routes_decorator('/students/', routes)
 def students_view(request):
+    mapper = MapperRegistry.get_current_mapper('student')
     context = {
         'title': 'Students view',
         'name_templates': {
@@ -154,13 +159,14 @@ def students_view(request):
             'create_student': '/create_student/',
             'add_student': '/add_student/'
         },
-        'list_students': engine.student
+        'list_students': mapper.all()
     }
     return '200 OK', [render('view_students.html', context=context)]
 
 
 @routes_decorator('/create_student/', routes)
 def students_create(request):
+    mapper = MapperRegistry.get_current_mapper('student')
     context = {
         'title': 'Students view',
         'name_templates': {
@@ -171,9 +177,10 @@ def students_create(request):
         },
     }
     if request['POST_DATA']:
-        student = engine.create_student(request['POST_DATA']['first_name'], request['POST_DATA']['last_name'])
-        engine.student.append(student)
-        context['list_students'] = engine.student
+        mapper.insert(request['POST_DATA'])
+        # student = engine.create_student(request['POST_DATA']['first_name'], request['POST_DATA']['last_name'])
+        # engine.student.append(student)
+        context['list_students'] = mapper.all()
         logger.logger('Студент создан')
         return '302 FOUND', [render('index.html', context=context)]
     return '200 OK', [render('create_student.html', context=context)]

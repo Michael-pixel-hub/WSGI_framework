@@ -1,4 +1,6 @@
 import copy
+from patterns.architectural_system_patterns import DomainObject
+from sqlite3 import connect
 
 
 # поведенческие паттерны
@@ -46,7 +48,7 @@ class AutoInstructor(User):
     pass
 
 
-class Student(User):
+class Student(User, DomainObject):
     pass
 
 
@@ -189,3 +191,83 @@ def routes_decorator(path, routes):
         routes[path] = func
         return inner
     return decorator_
+
+# архитектурные системные паттерны
+
+
+connection = connect('patterns.sqlite')
+
+
+class StudentMapper:
+    """
+    Класс StudentMapper передает данные между обьектом студента и базой данных
+    """
+    def __init__(self, connection):
+        self.connection = connection
+        self.cursor = connection.cursor()
+        self.tablename = 'student'
+
+    def all(self):
+        statement = f'SELECT * FROM {self.tablename}'
+        self.cursor.execute(statement)
+        students = self.cursor.fetchall()
+        result = []
+        for i in students:
+            id, first_name, last_name = i
+            student = Student(first_name, last_name)
+            student.id = id
+            result.append(student)
+        return result
+
+    def find_by_id(self, id_person):
+        statement = f'SELECT id, first_name, last_name FROM {self.tablename} WHERE id=?'
+        self.cursor.execute(statement, (id_person,))
+        result = self.cursor.fetchone()
+        if result:
+            return Student(*result)
+        else:
+            raise Exception(f'{id_person} not found')
+
+    def insert(self, obj):
+        statement = f'INSERT INTO {self.tablename} (first_name, last_name) VALUES (?, ?)'
+        self.cursor.execute(statement, (obj['first_name'], obj['last_name'],))
+        try:
+            self.connection.commit()
+        except Exception as e:
+            raise Exception('failed to add values to table')
+
+    def update(self, obj):
+        statement = f'UPDATE {self.tablename} SET first_name=? WHERE id=?'
+        self.cursor.execute(statement, (obj.first_name, obj.id))
+        statement = f'UPDATE {self.tablename} SET last_name=? WHERE id=?'
+        self.cursor.execute(statement, (obj.last_name, obj.id))
+        try:
+            self.connection.commit()
+        except Exception as e:
+            raise Exception('the values in the table could not be changed')
+
+    def delete(self, obj):
+        statement = f'DELETE FROM {self.tablename} WHERE id=?'
+        self.cursor.execute(statement, (obj.id,))
+        try:
+            self.connection.commit()
+        except Exception as e:
+            raise Exception('failed to delete the object')
+
+
+class MapperRegistry:
+    """
+    Класс MapperRegistry представляет из себя реестр с мапперами, которые можно получить
+    """
+    mappers = {
+        'student': StudentMapper,
+    }
+
+    @staticmethod
+    def get_mapper(obj):
+        if isinstance(obj, Student):
+            return StudentMapper(connection)
+
+    @staticmethod
+    def get_current_mapper(name):
+        return MapperRegistry.mappers[name](connection)
